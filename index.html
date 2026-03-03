@@ -54,19 +54,9 @@
   .lang-btn:hover { border-color: #667eea; transform: scale(1.05); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
   .lang-btn:active { transform: scale(0.97); }
   .lang-flag {
-    width: 80px;
-    height: 54px;
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    font-size: 56px;
+    line-height: 1;
   }
-  .flag-en .flag-stripe-1 { flex: 1; background: #012169; }
-  .flag-en .flag-stripe-2 { flex: 1; background: #C8102E; }
-  .flag-en .flag-stripe-3 { flex: 1; background: #FFFFFF; }
-  .flag-pl .flag-stripe-1 { flex: 1; background: #FFFFFF; }
-  .flag-pl .flag-stripe-2 { flex: 1; background: #DC143C; }
   .lang-name {
     font-size: 1.3rem;
     font-weight: 700;
@@ -230,18 +220,11 @@
     <h1>Choose Language</h1>
     <div class="lang-options">
       <button class="lang-btn" data-lang="en">
-        <div class="lang-flag flag-en">
-          <div class="flag-stripe-1"></div>
-          <div class="flag-stripe-2"></div>
-          <div class="flag-stripe-3"></div>
-        </div>
+        <div class="lang-flag">&#x1F1EC;&#x1F1E7;</div>
         <span class="lang-name">English</span>
       </button>
       <button class="lang-btn" data-lang="pl">
-        <div class="lang-flag flag-pl">
-          <div class="flag-stripe-1"></div>
-          <div class="flag-stripe-2"></div>
-        </div>
+        <div class="lang-flag">&#x1F1F5;&#x1F1F1;</div>
         <span class="lang-name">Polski</span>
       </button>
     </div>
