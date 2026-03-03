@@ -11,8 +11,26 @@ A standalone HTML math learning app for 2nd graders (ages 7-9).
 - **2 Languages** — English and Polish, selected at startup with flag icons
 - **Score & streak tracking** with star rewards
 - **Touch-friendly** — on-screen numpad for tablets and phones
-- **Zero dependencies** — single HTML file, works offline
+- **Zero dependencies** — no build step, no npm install needed
 
 ## How to use
 
-Open `index.html` in any browser, or visit the [live version](https://alexey-bass.github.io/kids-math-g2/).
+Visit the [live version](https://alexey-bass.github.io/kids-math-g2/).
+
+## Local development
+
+The app uses ES modules, so it needs to be served over HTTP (not opened as a `file://` URL). Use any local server:
+
+```bash
+npx serve
+```
+
+Then open `http://localhost:3000` in your browser.
+
+## Running tests
+
+Tests use the Node.js built-in test runner (Node 18+). No dependencies to install.
+
+```bash
+npm test
+```
