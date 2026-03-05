@@ -209,6 +209,65 @@
   }
   .op-btn:hover { border-color: #764ba2; color: #764ba2; }
   .op-btn.active { background: #764ba2; color: #fff; border-color: #764ba2; }
+
+  /* --- Mode picker --- */
+  .mode-screen { display: flex; flex-direction: column; align-items: center; }
+  .mode-screen h1 { font-size: 2.2rem; margin-bottom: 32px; }
+
+  /* --- Challenge setup --- */
+  .challenge-setup { display: flex; flex-direction: column; align-items: center; }
+  .challenge-setup h1 { font-size: 2.2rem; margin-bottom: 24px; }
+  .setup-section { margin-bottom: 20px; width: 100%; }
+  .setup-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  .btn-start {
+    margin-top: 16px;
+    font-size: 1.8rem;
+    padding: 16px 48px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+    color: #333;
+    cursor: pointer;
+    font-weight: 800;
+    letter-spacing: 2px;
+    transition: transform 0.15s;
+  }
+  .btn-start:hover { transform: scale(1.05); }
+  .btn-start:active { transform: scale(0.97); }
+
+  /* --- Timer bar --- */
+  .timer-bar {
+    margin-bottom: 12px;
+  }
+  .timer-display {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #e67e22;
+  }
+  .timer-display.urgent {
+    color: #e74c3c;
+    animation: pulse 0.5s infinite alternate;
+  }
+  @keyframes pulse { to { opacity: 0.5; } }
+
+  /* --- Results screen --- */
+  .results-screen { display: flex; flex-direction: column; align-items: center; }
+  .results-screen h1 { font-size: 2.2rem; margin-bottom: 24px; }
+  .results-stats {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  .result-row {
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 8px 0;
+    color: #333;
+  }
 </style>
 </head>
 <body class="theme-default">
@@ -219,20 +278,97 @@
   <div class="lang-screen" id="langScreen">
     <h1>Choose Language</h1>
     <div class="lang-options">
-      <button class="lang-btn" data-lang="en">
-        <div class="lang-flag">&#x1F1EC;&#x1F1E7;</div>
-        <span class="lang-name">English</span>
-      </button>
       <button class="lang-btn" data-lang="pl">
         <div class="lang-flag">&#x1F1F5;&#x1F1F1;</div>
         <span class="lang-name">Polski</span>
       </button>
+      <button class="lang-btn" data-lang="en">
+        <div class="lang-flag">&#x1F1EC;&#x1F1E7;</div>
+        <span class="lang-name">English</span>
+      </button>
+      <button class="lang-btn" data-lang="uk">
+        <div class="lang-flag">&#x1F1FA;&#x1F1E6;</div>
+        <span class="lang-name">&#x423;&#x43A;&#x440;&#x430;&#x457;&#x43D;&#x441;&#x44C;&#x43A;&#x430;</span>
+      </button>
     </div>
+  </div>
+
+  <!-- ======== Mode picker ======== -->
+  <div class="mode-screen" id="modeScreen" style="display:none">
+    <h1 id="modeTitle">Choose Mode</h1>
+    <div class="lang-options">
+      <button class="lang-btn" id="btnPractice" data-gmode="practice">
+        <div class="lang-flag">&#x1F4DA;</div>
+        <span class="lang-name" id="practiceLabel">Practice</span>
+      </button>
+      <button class="lang-btn" id="btnChallenge" data-gmode="challenge">
+        <div class="lang-flag">&#x1F3C6;</div>
+        <span class="lang-name" id="challengeLabel">Challenge</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ======== Challenge setup ======== -->
+  <div class="challenge-setup" id="challengeSetup" style="display:none">
+    <h1 id="challengeTitle">Challenge Mode</h1>
+
+    <div class="setup-section">
+      <div class="setup-label" id="timerLabel">Timer</div>
+      <div class="mode-selector">
+        <button class="mode-btn" data-timer="120">2 min</button>
+        <button class="mode-btn active" data-timer="300">5 min</button>
+        <button class="mode-btn" data-timer="600">10 min</button>
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <div class="setup-label" id="difficultyLabel">Difficulty</div>
+      <div class="mode-selector">
+        <button class="mode-btn active" data-cmode="easy" id="cBtnEasy">Easy</button>
+        <button class="mode-btn" data-cmode="medium" id="cBtnMedium">Medium</button>
+        <button class="mode-btn" data-cmode="hard" id="cBtnHard">Hard</button>
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <div class="setup-label" id="operationsLabel">Operations</div>
+      <div class="settings-row">
+        <button class="op-btn active" data-cop="+">+</button>
+        <button class="op-btn active" data-cop="−">−</button>
+        <button class="op-btn" data-cop="×">×</button>
+      </div>
+    </div>
+
+    <button class="btn-start" id="btnStart">START</button>
+  </div>
+
+  <!-- ======== Results screen ======== -->
+  <div class="results-screen" id="resultsScreen" style="display:none">
+    <h1 id="resultsTitle">Results</h1>
+    <div class="results-stats">
+      <div class="result-row correct-text">
+        <span id="resCorrectLbl">Correct</span>: <span id="resCorrect">0</span>
+      </div>
+      <div class="result-row wrong-text">
+        <span id="resWrongLbl">Wrong</span>: <span id="resWrong">0</span>
+      </div>
+      <div class="result-row">
+        <span id="resTotalLbl">Total</span>: <span id="resTotal">0</span>
+      </div>
+      <div class="result-row">
+        <span id="resAvgLbl">Avg time</span>: <span id="resAvg">0</span><span id="resAvgUnit">s</span>
+      </div>
+    </div>
+    <button class="btn-start" id="btnPlayAgain">Play Again</button>
   </div>
 
   <!-- ======== Game screen ======== -->
   <div class="game-screen" id="gameScreen">
     <h1 id="title">Math Fun!</h1>
+
+    <div class="timer-bar" id="timerBar" style="display:none">
+      <span class="timer-display" id="timerDisplay">5:00</span>
+    </div>
 
     <div class="score-bar">
       <span><span id="scoreLbl">Score</span>: <span class="correct" id="scoreVal">0</span></span>
@@ -299,6 +435,19 @@ const T = {
     praise: ['Awesome!', 'Great job!', 'You rock!', 'Super!', 'Fantastic!', 'Brilliant!', 'Nice one!', 'Wow!', 'Perfect!'],
     encourage: ['Almost!', 'Try again!', 'Keep going!', 'You can do it!', 'Not quite!', 'So close!'],
     wasAnswer: 'It was',
+    chooseMode: 'Choose Mode',
+    practice: 'Practice',
+    challenge: 'Challenge',
+    challengeTitle: 'Challenge Mode',
+    timer: 'Timer',
+    difficulty: 'Difficulty',
+    operations: 'Operations',
+    results: 'Results',
+    correct: 'Correct',
+    wrong: 'Wrong',
+    total: 'Total',
+    avgTime: 'Avg time',
+    playAgain: 'Play Again',
   },
   pl: {
     title: 'Matma!',
@@ -310,6 +459,43 @@ const T = {
     praise: ['Super!', 'Brawo!', 'Swietnie!', 'Tak trzymaj!', 'Fantastycznie!', 'Genialnie!', 'Wow!', 'Doskonale!', 'Rewelacja!'],
     encourage: ['Prawie!', 'Sprobuj jeszcze raz!', 'Nie poddawaj sie!', 'Dasz rade!', 'Niewiele brakuje!', 'Blisko!'],
     wasAnswer: 'Poprawna odpowiedz to',
+    chooseMode: 'Wybierz tryb',
+    practice: 'Cwiczenia',
+    challenge: 'Wyzwanie',
+    challengeTitle: 'Tryb wyzwania',
+    timer: 'Czas',
+    difficulty: 'Poziom',
+    operations: 'Dzialania',
+    results: 'Wyniki',
+    correct: 'Poprawne',
+    wrong: 'Bledne',
+    total: 'Razem',
+    avgTime: 'Sredni czas',
+    playAgain: 'Zagraj ponownie',
+  },
+  uk: {
+    title: '\u041C\u0430\u0442\u0435\u043C\u0430\u0442\u0438\u043A\u0430!',
+    score: '\u0420\u0430\u0445\u0443\u043D\u043E\u043A',
+    streak: '\u0421\u0435\u0440\u0456\u044F',
+    easy: '\u041B\u0435\u0433\u043A\u043E',
+    medium: '\u0421\u0435\u0440\u0435\u0434\u043D\u0454',
+    hard: '\u0421\u043A\u043B\u0430\u0434\u043D\u043E',
+    praise: ['\u0427\u0443\u0434\u043E\u0432\u043E!', '\u0411\u0440\u0430\u0432\u043E!', '\u0427\u0443\u0434\u043E\u0432\u043E!', '\u0422\u0430\u043A \u0442\u0440\u0438\u043C\u0430\u0442\u0438!', '\u0424\u0430\u043D\u0442\u0430\u0441\u0442\u0438\u0447\u043D\u043E!', '\u0413\u0435\u043D\u0456\u0430\u043B\u044C\u043D\u043E!', '\u0412\u0430\u0443!', '\u0414\u043E\u0441\u043A\u043E\u043D\u0430\u043B\u043E!', '\u0421\u0443\u043F\u0435\u0440!'],
+    encourage: ['\u041C\u0430\u0439\u0436\u0435!', '\u0421\u043F\u0440\u043E\u0431\u0443\u0439 \u0449\u0435!', '\u041D\u0435 \u0437\u0434\u0430\u0432\u0430\u0439\u0441\u044F!', '\u0422\u0438 \u0437\u043C\u043E\u0436\u0435\u0448!', '\u041C\u0430\u0439\u0436\u0435 \u0432\u0434\u0430\u043B\u043E\u0441\u044F!', '\u0411\u043B\u0438\u0437\u044C\u043A\u043E!'],
+    wasAnswer: '\u041F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u0430 \u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u044C',
+    chooseMode: '\u041E\u0431\u0435\u0440\u0438 \u0440\u0435\u0436\u0438\u043C',
+    practice: '\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430',
+    challenge: '\u0417\u043C\u0430\u0433\u0430\u043D\u043D\u044F',
+    challengeTitle: '\u0420\u0435\u0436\u0438\u043C \u0437\u043C\u0430\u0433\u0430\u043D\u043D\u044F',
+    timer: '\u0427\u0430\u0441',
+    difficulty: '\u0421\u043A\u043B\u0430\u0434\u043D\u0456\u0441\u0442\u044C',
+    operations: '\u0414\u0456\u0457',
+    results: '\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u0438',
+    correct: '\u041F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u043E',
+    wrong: '\u041D\u0435\u043F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u043E',
+    total: '\u0412\u0441\u044C\u043E\u0433\u043E',
+    avgTime: '\u0421\u0435\u0440. \u0447\u0430\u0441',
+    playAgain: '\u0413\u0440\u0430\u0442\u0438 \u0437\u043D\u043E\u0432\u0443',
   }
 };
 
@@ -318,47 +504,117 @@ let lang = 'en';
 /* --- State --- */
 let correctAnswer = 0;
 let score = 0;
+let wrongCount = 0;
 let streak = 0;
 let bestStreak = 0;
 let mode = 'easy';
 let ops = new Set(['+', '−']);
+let gameMode = 'practice'; // 'practice' or 'challenge'
+let challengeTimer = 300;  // seconds
+let challengeOps = new Set(['+', '−']);
+let timerInterval = null;
+let timeRemaining = 0;
+let problemStartTime = 0;
+let totalSolveTime = 0;
 
 /* --- DOM refs --- */
-const langScreen = document.getElementById('langScreen');
-const gameScreen = document.getElementById('gameScreen');
-const titleEl    = document.getElementById('title');
-const scoreLbl   = document.getElementById('scoreLbl');
-const streakLbl  = document.getElementById('streakLbl');
-const btnEasy    = document.getElementById('btnEasy');
-const btnMedium  = document.getElementById('btnMedium');
-const btnHard    = document.getElementById('btnHard');
-const problemEl  = document.getElementById('problem');
-const feedbackEl = document.getElementById('feedback');
-const starsEl    = document.getElementById('stars');
-const answerEl   = document.getElementById('answer');
-const scoreEl    = document.getElementById('scoreVal');
-const streakEl   = document.getElementById('streakVal');
-const checkBtn   = document.getElementById('checkBtn');
+const langScreen      = document.getElementById('langScreen');
+const modeScreen      = document.getElementById('modeScreen');
+const challengeSetup  = document.getElementById('challengeSetup');
+const resultsScreen   = document.getElementById('resultsScreen');
+const gameScreen      = document.getElementById('gameScreen');
+const titleEl         = document.getElementById('title');
+const scoreLbl        = document.getElementById('scoreLbl');
+const streakLbl       = document.getElementById('streakLbl');
+const btnEasy         = document.getElementById('btnEasy');
+const btnMedium       = document.getElementById('btnMedium');
+const btnHard         = document.getElementById('btnHard');
+const problemEl       = document.getElementById('problem');
+const feedbackEl      = document.getElementById('feedback');
+const starsEl         = document.getElementById('stars');
+const answerEl        = document.getElementById('answer');
+const scoreEl         = document.getElementById('scoreVal');
+const streakEl        = document.getElementById('streakVal');
+const checkBtn        = document.getElementById('checkBtn');
+const timerBar        = document.getElementById('timerBar');
+const timerDisplay    = document.getElementById('timerDisplay');
 
 /* --- Helpers --- */
 const t = () => T[lang];
 
+function showScreen(screen) {
+  [langScreen, modeScreen, challengeSetup, resultsScreen, gameScreen].forEach(s => s.style.display = 'none');
+  screen.style.display = 'block';
+  if (screen === modeScreen || screen === langScreen) screen.style.display = 'flex';
+  if (screen === challengeSetup || screen === resultsScreen) screen.style.display = 'flex';
+}
+
 /* --- Language picker --- */
-document.querySelectorAll('.lang-btn').forEach(btn => {
+document.querySelectorAll('.lang-btn[data-lang]').forEach(btn => {
   btn.addEventListener('click', () => {
     lang = btn.dataset.lang;
-    startGame();
+    applyAllLang();
+    showScreen(modeScreen);
   });
 });
 
-function startGame() {
-  langScreen.style.display = 'none';
-  gameScreen.style.display = 'block';
-  applyLang();
+/* --- Mode picker --- */
+document.getElementById('btnPractice').addEventListener('click', () => {
+  gameMode = 'practice';
+  startPractice();
+});
+document.getElementById('btnChallenge').addEventListener('click', () => {
+  gameMode = 'challenge';
+  showScreen(challengeSetup);
+});
+
+function startPractice() {
+  timerBar.style.display = 'none';
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  showScreen(gameScreen);
+  applyGameLang();
+  resetStats();
   newProblem();
 }
 
-function applyLang() {
+function resetStats() {
+  score = 0;
+  wrongCount = 0;
+  streak = 0;
+  bestStreak = 0;
+  totalSolveTime = 0;
+  scoreEl.textContent = '0';
+  streakEl.textContent = '0';
+  starsEl.textContent = '';
+}
+
+function applyAllLang() {
+  // Mode screen
+  document.getElementById('modeTitle').textContent = t().chooseMode;
+  document.getElementById('practiceLabel').textContent = t().practice;
+  document.getElementById('challengeLabel').textContent = t().challenge;
+
+  // Challenge setup
+  document.getElementById('challengeTitle').textContent = t().challengeTitle;
+  document.getElementById('timerLabel').textContent = t().timer;
+  document.getElementById('difficultyLabel').textContent = t().difficulty;
+  document.getElementById('operationsLabel').textContent = t().operations;
+  document.getElementById('cBtnEasy').textContent = t().easy;
+  document.getElementById('cBtnMedium').textContent = t().medium;
+  document.getElementById('cBtnHard').textContent = t().hard;
+
+  // Results screen
+  document.getElementById('resultsTitle').textContent = t().results;
+  document.getElementById('resCorrectLbl').textContent = t().correct;
+  document.getElementById('resWrongLbl').textContent = t().wrong;
+  document.getElementById('resTotalLbl').textContent = t().total;
+  document.getElementById('resAvgLbl').textContent = t().avgTime;
+  document.getElementById('btnPlayAgain').textContent = t().playAgain;
+
+  applyGameLang();
+}
+
+function applyGameLang() {
   titleEl.textContent   = t().title;
   scoreLbl.textContent  = t().score;
   streakLbl.textContent = t().streak;
@@ -366,6 +622,95 @@ function applyLang() {
   btnMedium.textContent = t().medium;
   btnHard.textContent   = t().hard;
 }
+
+/* --- Challenge setup controls --- */
+document.querySelectorAll('[data-timer]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-timer]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    challengeTimer = parseInt(btn.dataset.timer, 10);
+  });
+});
+
+document.querySelectorAll('[data-cmode]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-cmode]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.querySelectorAll('[data-cop]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const op = btn.dataset.cop;
+    if (challengeOps.has(op) && challengeOps.size > 1) challengeOps.delete(op);
+    else challengeOps.add(op);
+    document.querySelectorAll('[data-cop]').forEach(b => {
+      b.classList.toggle('active', challengeOps.has(b.dataset.cop));
+    });
+  });
+});
+
+/* --- Start challenge --- */
+document.getElementById('btnStart').addEventListener('click', () => {
+  // Apply challenge settings to game
+  const activeMode = document.querySelector('[data-cmode].active');
+  mode = activeMode ? activeMode.dataset.cmode : 'easy';
+  ops = new Set(challengeOps);
+
+  // Sync game difficulty buttons
+  document.querySelectorAll('.mode-btn[data-mode]').forEach(b => b.classList.remove('active'));
+  const matchBtn = document.querySelector(`.mode-btn[data-mode="${mode}"]`);
+  if (matchBtn) matchBtn.classList.add('active');
+
+  // Sync game operation buttons
+  document.querySelectorAll('.op-btn[data-op]').forEach(b => {
+    b.classList.toggle('active', ops.has(b.dataset.op));
+  });
+
+  resetStats();
+  showScreen(gameScreen);
+  applyGameLang();
+
+  // Start timer
+  timeRemaining = challengeTimer;
+  timerBar.style.display = 'block';
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeRemaining--;
+    updateTimerDisplay();
+    if (timeRemaining <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      endChallenge();
+    }
+  }, 1000);
+
+  newProblem();
+});
+
+function updateTimerDisplay() {
+  const min = Math.floor(timeRemaining / 60);
+  const sec = timeRemaining % 60;
+  timerDisplay.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+  timerDisplay.classList.toggle('urgent', timeRemaining <= 10);
+}
+
+function endChallenge() {
+  showScreen(resultsScreen);
+  document.body.className = 'theme-default';
+  const totalAnswered = score + wrongCount;
+  document.getElementById('resCorrect').textContent = score;
+  document.getElementById('resWrong').textContent = wrongCount;
+  document.getElementById('resTotal').textContent = totalAnswered;
+  const avg = totalAnswered > 0 ? (totalSolveTime / totalAnswered / 1000).toFixed(1) : '0';
+  document.getElementById('resAvg').textContent = avg;
+  document.getElementById('resAvgUnit').textContent = 's';
+}
+
+/* --- Play again --- */
+document.getElementById('btnPlayAgain').addEventListener('click', () => {
+  showScreen(modeScreen);
+});
 
 /* --- Generate problem --- */
 function newProblem() {
@@ -378,13 +723,18 @@ function newProblem() {
   feedbackEl.className = 'feedback';
   answerEl.value = '';
   document.body.className = 'theme-default';
+  problemStartTime = Date.now();
   answerEl.focus();
 }
 
 /* --- Check answer --- */
 function check() {
+  if (gameMode === 'challenge' && !timerInterval) return;
   const result = checkAnswer(answerEl.value, correctAnswer);
   if (result === null) return;
+
+  const solveTime = Date.now() - problemStartTime;
+  totalSolveTime += solveTime;
 
   if (result) {
     score++;
@@ -396,6 +746,7 @@ function check() {
     updateStars();
     setTimeout(newProblem, 900);
   } else {
+    wrongCount++;
     streak = 0;
     feedbackEl.textContent = `${pick(t().encourage)} ${t().wasAnswer} ${correctAnswer}.`;
     feedbackEl.className = 'feedback wrong-text';
@@ -413,9 +764,9 @@ function updateStars() {
 }
 
 /* --- Difficulty buttons --- */
-document.querySelectorAll('.mode-btn').forEach(btn => {
+document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.mode-btn[data-mode]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     mode = btn.dataset.mode;
     newProblem();
@@ -424,11 +775,11 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
 
 /* --- Operation toggle buttons --- */
 function updateOpButtons() {
-  document.querySelectorAll('.op-btn').forEach(b => {
+  document.querySelectorAll('.op-btn[data-op]').forEach(b => {
     b.classList.toggle('active', ops.has(b.dataset.op));
   });
 }
-document.querySelectorAll('.op-btn').forEach(btn => {
+document.querySelectorAll('.op-btn[data-op]').forEach(btn => {
   btn.addEventListener('click', () => {
     const op = btn.dataset.op;
     if (ops.has(op) && ops.size > 1) ops.delete(op);
