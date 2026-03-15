@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=0.8">
 <title>Math Fun!</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -305,6 +305,10 @@
         <div class="lang-flag">&#x1F3C6;</div>
         <span class="lang-name" id="challengeLabel">Challenge</span>
       </button>
+      <button class="lang-btn" id="btnTables" data-gmode="tables">
+        <div class="lang-flag">&#x1F9EE;</div>
+        <span class="lang-name" id="tablesLabel">Times Tables</span>
+      </button>
     </div>
   </div>
 
@@ -336,6 +340,7 @@
         <button class="op-btn active" data-cop="+">+</button>
         <button class="op-btn active" data-cop="−">−</button>
         <button class="op-btn" data-cop="×">×</button>
+        <button class="op-btn" data-cop="÷">÷</button>
       </div>
     </div>
 
@@ -375,18 +380,23 @@
       <span><span id="streakLbl">Streak</span>: <span class="streak" id="streakVal">0</span></span>
     </div>
 
+    <div class="score-bar" id="progressBar" style="display:none">
+      <span><span id="progressLbl">Progress</span>: <span id="progressVal">0 / 0</span></span>
+    </div>
+
     <!-- Difficulty -->
-    <div class="mode-selector">
+    <div class="mode-selector" id="gameDifficulty">
       <button class="mode-btn active" data-mode="easy" id="btnEasy">Easy</button>
       <button class="mode-btn" data-mode="medium" id="btnMedium">Medium</button>
       <button class="mode-btn" data-mode="hard" id="btnHard">Hard</button>
     </div>
 
     <!-- Operations -->
-    <div class="settings-row">
+    <div class="settings-row" id="gameOps">
       <button class="op-btn active" data-op="+">+</button>
       <button class="op-btn active" data-op="−">−</button>
       <button class="op-btn" data-op="×">×</button>
+      <button class="op-btn" data-op="÷">÷</button>
     </div>
 
     <div class="problem" id="problem"></div>
@@ -421,7 +431,7 @@
 </div>
 
 <script type="module">
-import { pick, generateProblem, checkAnswer } from './math.js';
+import { pick, shuffle, generateProblem, generateTableProblems, checkAnswer } from './math.js';
 
 /* --- i18n --- */
 const T = {
@@ -448,6 +458,9 @@ const T = {
     total: 'Total',
     avgTime: 'Avg time',
     playAgain: 'Play Again',
+    timesTables: 'Times Tables',
+
+    progress: 'Progress',
   },
   pl: {
     title: 'Matma!',
@@ -472,6 +485,9 @@ const T = {
     total: 'Razem',
     avgTime: 'Sredni czas',
     playAgain: 'Zagraj ponownie',
+    timesTables: 'Tabliczka mno\u017Cenia',
+
+    progress: 'Post\u0119p',
   },
   uk: {
     title: '\u041C\u0430\u0442\u0435\u043C\u0430\u0442\u0438\u043A\u0430!',
@@ -496,6 +512,9 @@ const T = {
     total: '\u0412\u0441\u044C\u043E\u0433\u043E',
     avgTime: '\u0421\u0435\u0440. \u0447\u0430\u0441',
     playAgain: '\u0413\u0440\u0430\u0442\u0438 \u0437\u043D\u043E\u0432\u0443',
+    timesTables: '\u0422\u0430\u0431\u043B\u0438\u0446\u044F \u043C\u043D\u043E\u0436\u0435\u043D\u043D\u044F',
+
+    progress: '\u041F\u0440\u043E\u0433\u0440\u0435\u0441',
   }
 };
 
@@ -516,6 +535,9 @@ let timerInterval = null;
 let timeRemaining = 0;
 let problemStartTime = 0;
 let totalSolveTime = 0;
+let seenProblems = new Set();
+let tableProblems = [];
+let tableIndex = 0;
 
 /* --- DOM refs --- */
 const langScreen      = document.getElementById('langScreen');
@@ -567,10 +589,27 @@ document.getElementById('btnChallenge').addEventListener('click', () => {
   gameMode = 'challenge';
   showScreen(challengeSetup);
 });
+document.getElementById('btnTables').addEventListener('click', () => {
+  gameMode = 'tables';
+  tableProblems = shuffle(generateTableProblems([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+  tableIndex = 0;
+  resetStats();
+  showScreen(gameScreen);
+  applyGameLang();
+  document.getElementById('gameDifficulty').style.display = 'none';
+  document.getElementById('gameOps').style.display = 'none';
+  document.getElementById('progressBar').style.display = 'flex';
+  timerBar.style.display = 'none';
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  newProblem();
+});
 
 function startPractice() {
   timerBar.style.display = 'none';
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  document.getElementById('gameDifficulty').style.display = 'flex';
+  document.getElementById('gameOps').style.display = 'flex';
+  document.getElementById('progressBar').style.display = 'none';
   showScreen(gameScreen);
   applyGameLang();
   resetStats();
@@ -602,6 +641,10 @@ function applyAllLang() {
   document.getElementById('cBtnEasy').textContent = t().easy;
   document.getElementById('cBtnMedium').textContent = t().medium;
   document.getElementById('cBtnHard').textContent = t().hard;
+
+  // Tables & progress
+  document.getElementById('tablesLabel').textContent = t().timesTables;
+  document.getElementById('progressLbl').textContent = t().progress;
 
   // Results screen
   document.getElementById('resultsTitle').textContent = t().results;
@@ -670,6 +713,10 @@ document.getElementById('btnStart').addEventListener('click', () => {
   resetStats();
   showScreen(gameScreen);
   applyGameLang();
+  document.getElementById('gameDifficulty').style.display = 'flex';
+  document.getElementById('gameOps').style.display = 'flex';
+  document.getElementById('progressBar').style.display = 'none';
+  seenProblems = new Set();
 
   // Start timer
   timeRemaining = challengeTimer;
@@ -714,9 +761,39 @@ document.getElementById('btnPlayAgain').addEventListener('click', () => {
 
 /* --- Generate problem --- */
 function newProblem() {
+  if (gameMode === 'tables') {
+    if (tableIndex >= tableProblems.length) {
+      endChallenge();
+      return;
+    }
+    const p = tableProblems[tableIndex];
+    tableIndex++;
+    correctAnswer = p.correctAnswer;
+    problemEl.textContent = p.text;
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+    answerEl.value = '';
+    document.body.className = 'theme-default';
+    problemStartTime = Date.now();
+    document.getElementById('progressVal').textContent = `${tableIndex} / ${tableProblems.length}`;
+    answerEl.focus();
+    return;
+  }
+
   const activeOps = [...ops];
   if (activeOps.length === 0) { ops.add('+'); activeOps.push('+'); updateOpButtons(); }
-  const p = generateProblem(mode, activeOps);
+
+  let p;
+  let attempts = 0;
+  do {
+    p = generateProblem(mode, activeOps);
+    attempts++;
+  } while (gameMode === 'challenge' && seenProblems.has(`${p.a} ${p.op} ${p.b}`) && attempts < 50);
+
+  if (gameMode === 'challenge') {
+    seenProblems.add(`${p.a} ${p.op} ${p.b}`);
+  }
+
   correctAnswer = p.correctAnswer;
   problemEl.textContent = p.text;
   feedbackEl.textContent = '';

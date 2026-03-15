@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { rand, pick, getRange, generateProblem, checkAnswer } from './math.js';
+import { rand, pick, getRange, generateProblem, shuffle, generateTableProblems, checkAnswer } from './math.js';
 
 describe('rand', () => {
   it('returns values within [min, max]', () => {
@@ -117,9 +117,79 @@ describe('generateProblem', () => {
     assert.ok(sawOne, 'easy mode should allow 1 as a multiplication operand');
   });
 
+  it('generates correct division problems', () => {
+    for (let i = 0; i < 50; i++) {
+      const p = generateProblem('hard', ['÷']);
+      assert.strictEqual(p.op, '÷');
+      assert.strictEqual(p.a % p.b, 0, `${p.a} not divisible by ${p.b}`);
+      assert.strictEqual(p.correctAnswer, p.a / p.b);
+      assert.ok(p.b >= 2 && p.b <= 12);
+    }
+  });
+
+  it('division always produces whole number results', () => {
+    for (let i = 0; i < 200; i++) {
+      const p = generateProblem('medium', ['÷']);
+      assert.strictEqual(p.a % p.b, 0);
+      assert.ok(Number.isInteger(p.correctAnswer));
+    }
+  });
+
+  it('division never divides by zero', () => {
+    for (let i = 0; i < 200; i++) {
+      const p = generateProblem('easy', ['÷']);
+      assert.ok(p.b >= 1, `divisor was ${p.b}`);
+    }
+  });
+
   it('returns a text property with = ?', () => {
     const p = generateProblem('easy', ['+']);
     assert.ok(p.text.endsWith('= ?'));
+  });
+});
+
+describe('shuffle', () => {
+  it('returns the same array reference', () => {
+    const arr = [1, 2, 3];
+    assert.strictEqual(shuffle(arr), arr);
+  });
+
+  it('preserves all elements', () => {
+    const arr = [1, 2, 3, 4, 5];
+    shuffle(arr);
+    assert.deepStrictEqual([...arr].sort(), [1, 2, 3, 4, 5]);
+  });
+
+  it('handles empty array', () => {
+    assert.deepStrictEqual(shuffle([]), []);
+  });
+
+  it('handles single element', () => {
+    assert.deepStrictEqual(shuffle([42]), [42]);
+  });
+});
+
+describe('generateTableProblems', () => {
+  it('generates 9 problems per table', () => {
+    assert.strictEqual(generateTableProblems([3]).length, 9);
+  });
+
+  it('generates correct multiplication facts', () => {
+    const problems = generateTableProblems([7]);
+    for (const p of problems) {
+      assert.strictEqual(p.a, 7);
+      assert.strictEqual(p.op, '×');
+      assert.strictEqual(p.correctAnswer, 7 * p.b);
+    }
+  });
+
+  it('covers factors 1 through 10', () => {
+    const factors = generateTableProblems([5]).map(p => p.b).sort((a, b) => a - b);
+    assert.deepStrictEqual(factors, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  });
+
+  it('handles multiple tables', () => {
+    assert.strictEqual(generateTableProblems([2, 3]).length, 18);
   });
 });
 

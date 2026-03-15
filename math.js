@@ -22,7 +22,7 @@ export function getRange(mode) {
 /**
  * Generate a math problem.
  * @param {string} mode - 'easy' | 'medium' | 'hard'
- * @param {string[]} activeOps - array of operation symbols: '+', '−', '×'
+ * @param {string[]} activeOps - array of operation symbols: '+', '−', '×', '÷'
  * @returns {{ a: number, b: number, op: string, correctAnswer: number, text: string }}
  */
 export function generateProblem(mode, activeOps) {
@@ -40,6 +40,13 @@ export function generateProblem(mode, activeOps) {
     b = rand(1, a);
     correctAnswer = a - b;
     text = `${a} − ${b} = ?`;
+  } else if (op === '÷') {
+    const mulMin = mode === 'easy' ? 1 : 2;
+    b = rand(mulMin, r.mul);
+    const quotient = rand(mulMin, r.mul);
+    a = b * quotient;
+    correctAnswer = quotient;
+    text = `${a} ÷ ${b} = ?`;
   } else {
     const mulMin = mode === 'easy' ? 1 : 2;
     a = rand(mulMin, r.mul);
@@ -57,6 +64,30 @@ export function generateProblem(mode, activeOps) {
  * @param {number} correctAnswer
  * @returns {true | false | null} true = correct, false = wrong, null = empty/invalid
  */
+/** Shuffle array in place (Fisher-Yates) */
+export function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/**
+ * Generate all problems for given multiplication tables (factors 1–10).
+ * @param {number[]} tables - e.g. [2, 3, 7]
+ * @returns {Array<{a: number, b: number, op: string, correctAnswer: number, text: string}>}
+ */
+export function generateTableProblems(tables) {
+  const problems = [];
+  for (const t of tables) {
+    for (let i = 1; i <= 9; i++) {
+      problems.push({ a: t, b: i, op: '×', correctAnswer: t * i, text: `${t} × ${i} = ?` });
+    }
+  }
+  return problems;
+}
+
 export function checkAnswer(inputVal, correctAnswer) {
   const trimmed = inputVal.trim();
   if (trimmed === '') return null;

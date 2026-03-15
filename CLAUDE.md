@@ -15,13 +15,16 @@ Live: https://alexey-bass.github.io/kids-math-g2/
 
 ## Architecture
 
-- **`index.html`** — entire app: HTML, CSS, and game logic in a `<script type="module">`. Contains i18n strings (English/Polish), UI state management, DOM event handlers, and numpad input.
-- **`math.js`** — pure functions extracted for testability: `rand`, `pick`, `getRange`, `generateProblem`, `checkAnswer`. Imported by both `index.html` and tests.
+- **`index.html`** — entire app: HTML, CSS, and game logic in a `<script type="module">`. Contains i18n strings (English/Polish/Ukrainian), UI state management, DOM event handlers, and numpad input.
+- **`math.js`** — pure functions extracted for testability: `rand`, `pick`, `getRange`, `generateProblem`, `shuffle`, `generateTableProblems`, `checkAnswer`. Imported by both `index.html` and tests.
 - **`math.test.js`** — tests for `math.js` using `node:test` and `node:assert/strict`.
 
 ## Key Details
 
-- Operations use Unicode symbols: `+`, `−` (U+2212 minus), `×` (U+00D7 multiply) — not ASCII `-` or `x`
+- Operations use Unicode symbols: `+`, `−` (U+2212 minus), `×` (U+00D7 multiply), `÷` (U+00F7 divide) — not ASCII `-`, `x`, or `/`
 - Subtraction always produces non-negative results (b <= a)
-- Multiplication on medium/hard difficulty excludes ×1 (mulMin = 2)
+- Division always produces whole-number results (dividend = divisor × quotient)
+- Multiplication/division on medium/hard difficulty excludes ×1/÷1 (mulMin = 2)
+- Challenge mode tracks seen problems to avoid duplicates within a session
+- Times Tables mode drills all 81 facts (1×1 through 9×9) in shuffled order
 - The answer input is `readonly` — all input comes through the on-screen numpad (prevents mobile keyboard)
