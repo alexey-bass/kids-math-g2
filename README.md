@@ -9,7 +9,7 @@ A standalone HTML math learning app for 2nd graders (ages 7-9).
 - **Addition, Subtraction, Multiplication, Division** — toggle operations on/off
 - **3 Game modes** — Practice (endless), Challenge (timed with results), and Times Tables (all 81 facts from 1×1 to 9×9)
 - **3 Difficulty levels** — Easy (up to 20), Medium (up to 50), Hard (up to 100)
-- **3 Languages** — English, Polish, and Ukrainian, selected at startup with flag icons
+- **2 Languages** — English and Polish, selected at startup with flag icons
 - **Challenge mode** — choose timer (2/5/10 min), difficulty, and operations; see results with accuracy and average solve time
 - **Score & streak tracking** with star rewards
 - **Touch-friendly** — on-screen numpad for tablets and phones
